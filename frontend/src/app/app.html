@@ -1,18 +1,42 @@
-<header class="app-header">
-  <div class="header-content">
-    <h1>Gestión de Créditos</h1>
-    <button class="nav-button" (click)="cambiarPantalla()">
-      {{ pantalla === 'forms' ? 'Ver solicitudes' : 'Nueva solicitud' }}
-    </button>
+<a class="salto-contenido" href="#contenido">Saltar al contenido principal</a>
+
+<header class="cabecera">
+  <div class="cabecera__interior">
+    <div class="cabecera__marca">
+      <span class="cabecera__logo" aria-hidden="true">BC</span>
+      <div>
+        <h1>BlueCore</h1>
+        <p class="cabecera__lema">Gestión de solicitudes de crédito</p>
+      </div>
+    </div>
+
+    <nav class="navegacion" aria-label="Secciones">
+      <button
+        type="button"
+        class="navegacion__opcion"
+        [class.navegacion__opcion--activa]="pantalla() === 'formulario'"
+        [attr.aria-current]="pantalla() === 'formulario' ? 'page' : null"
+        (click)="irA('formulario')"
+      >
+        Nueva solicitud
+      </button>
+      <button
+        type="button"
+        class="navegacion__opcion"
+        [class.navegacion__opcion--activa]="pantalla() === 'listado'"
+        [attr.aria-current]="pantalla() === 'listado' ? 'page' : null"
+        (click)="irA('listado')"
+      >
+        Solicitudes
+      </button>
+    </nav>
   </div>
 </header>
 
-<main class="main-container">
-  @if (pantalla === 'forms') {
-    <app-forms />
-  }
-
-  @if (pantalla === 'lista') {
-    <app-lista />
+<main class="contenido" id="contenido" tabindex="-1">
+  @if (pantalla() === 'formulario') {
+    <app-solicitud-form (creada)="alCrearSolicitud()" (verListado)="irA('listado')" />
+  } @else {
+    <app-solicitudes-lista [revision]="revision()" />
   }
 </main>

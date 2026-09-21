@@ -1,21 +1,28 @@
-import { Forms } from './forms/forms';
-import { Lista } from './lista/lista';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { SolicitudesLista } from './solicitudes/pages/solicitudes-lista/solicitudes-lista';
+import { SolicitudForm } from './solicitudes/pages/solicitud-form/solicitud-form';
+
+type Pantalla = 'formulario' | 'listado';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [Forms, Lista],
+  imports: [SolicitudForm, SolicitudesLista],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
+  readonly pantalla = signal<Pantalla>('formulario');
 
-  pantalla: 'forms' | 'lista' = 'forms';
+  /** Se incrementa al crear una solicitud para que el listado vuelva a cargarse. */
+  readonly revision = signal(0);
 
-  cambiarPantalla() {
-    this.pantalla = this.pantalla === 'forms'
-      ? 'lista'
-      : 'forms';
+  irA(pantalla: Pantalla): void {
+    this.pantalla.set(pantalla);
+  }
+
+  alCrearSolicitud(): void {
+    this.revision.update((valor) => valor + 1);
   }
 }

@@ -1,0 +1,157 @@
+<section class="tarjeta listado" aria-labelledby="titulo-listado">
+  <header class="listado__encabezado">
+    <div>
+      <h2 id="titulo-listado">Solicitudes de crédito</h2>
+      <p class="listado__subtitulo">
+        Revisa las solicitudes registradas y resuelve las que estén pendientes.
+      </p>
+    </div>
+
+    <div class="campo listado__filtro">
+      <label class="campo__etiqueta" for="filtro-estado">Filtrar por estado</label>
+      <select
+        id="filtro-estado"
+        class="campo__control"
+        [value]="filtro()"
+        (change)="cambiarFiltro($any($event.target).value)"
+      >
+        @for (opcion of opcionesFiltro; track opcion.valor) {
+          <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+        }
+      </select>
+    </div>
+  </header>
+
+  <!-- Anuncios de estado para lectores de pantalla -->
+  <p class="solo-lectores" aria-live="polite">
+    @if (cargando()) {
+      Cargando solicitudes.
+    } @else if (error()) {
+      Error al cargar las solicitudes.
+    } @else {
+      {{ solicitudes().length }} solicitudes en la vista {{ etiquetaFiltro() }}.
+    }
+  </p>
+
+  @if (ultimoCambio(); as aviso) {
+    <div class="aviso aviso--exito" role="status">
+      <p>{{ aviso }}</p>
+    </div>
+  }
+
+  @if (cargando()) {
+    <!-- Estado de carga -->
+    <div class="marcador" aria-hidden="true">
+      @for (fila of [1, 2, 3]; track fila) {
+        <div class="marcador__fila"></div>
+      }
+    </div>
+  } @else if (error(); as mensaje) {
+    <!-- Estado de error -->
+    <div class="aviso aviso--error" role="alert">
+      <div>
+        <p class="aviso__titulo">No se pudieron cargar las solicitudes</p>
+        <p>{{ mensaje }}</p>
+        <div class="aviso__acciones">
+          <button type="button" class="boton boton--secundario" (click)="reintentar()">
+            Reintentar
+          </button>
+        </div>
+      </div>
+    </div>
+  } @else if (solicitudes().length === 0) {
+    <!-- Estado vacío, distinguiendo si lo causa el filtro -->
+    <div class="vacio">
+      @if (hayFiltroActivo()) {
+        <p class="vacio__titulo">No hay solicitudes en «{{ etiquetaFiltro() }}»</p>
+        <p class="vacio__texto">Prueba con otro estado o quita el filtro para verlas todas.</p>
+        <button type="button" class="boton boton--secundario" (click)="limpiarFiltro()">
+          Ver todas las solicitudes
+        </button>
+      } @else {
+        <p class="vacio__titulo">Todavía no hay solicitudes registradas</p>
+        <p class="vacio__texto">Crea la primera desde la pestaña «Nueva solicitud».</p>
+      }
+    </div>
+  } @else {
+    <div class="tabla__marco">
+      <table class="tabla" role="table">
+        <caption class="solo-lectores">
+          Solicitudes de crédito, vista
+          {{
+            etiquetaFiltro()
+          }}
+        </caption>
+        <thead>
+          <tr role="row">
+            <th role="columnheader" scope="col">N.º</th>
+            <th role="columnheader" scope="col">Cédula</th>
+            <th role="columnheader" scope="col">Monto</th>
+            <th role="columnheader" scope="col">Plazo</th>
+            <th role="columnheader" scope="col">Fecha</th>
+            <th role="columnheader" scope="col">Estado</th>
+            <th role="columnheader" scope="col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (solicitud of solicitudes(); track solicitud.id) {
+            <tr role="row">
+              <td role="cell" data-etiqueta="N.º">{{ solicitud.id }}</td>
+              <td role="cell" data-etiqueta="Cédula">{{ solicitud.cedula }}</td>
+              <td role="cell" data-etiqueta="Monto" class="tabla__numero">
+                {{ formatearMoneda(solicitud.monto) }}
+              </td>
+              <td role="cell" data-etiqueta="Plazo">{{ solicitud.plazoMeses }} meses</td>
+              <td role="cell" data-etiqueta="Fecha">
+                {{ formatearFecha(solicitud.fechaCreacion) }}
+              </td>
+              <td role="cell" data-etiqueta="Estado">
+                <app-estado-badge [estado]="solicitud.estado" />
+                @if (solicitud.comentario) {
+                  <p class="tabla__comentario" [title]="solicitud.comentario">
+                    «{{ solicitud.comentario }}»
+                  </p>
+                }
+              </td>
+              <td role="cell" data-etiqueta="Acciones">
+                @if (solicitud.estado === 'PENDIENTE') {
+                  <div class="acciones">
+                    <button
+                      type="button"
+                      class="boton boton--aprobar acciones__boton"
+                      (click)="abrirDecision(solicitud, 'APROBADA')"
+                    >
+                      Aprobar
+                      <span class="solo-lectores">solicitud N.º {{ solicitud.id }}</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="boton boton--rechazar acciones__boton"
+                      (click)="abrirDecision(solicitud, 'RECHAZADA')"
+                    >
+                      Rechazar
+                      <span class="solo-lectores">solicitud N.º {{ solicitud.id }}</span>
+                    </button>
+                  </div>
+                } @else {
+                  <span class="acciones__resuelta">Resuelta</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
+
+@if (decision(); as pendiente) {
+  <app-confirmar-estado-dialog
+    [solicitud]="pendiente.solicitud"
+    [estadoDestino]="pendiente.destino"
+    [enviando]="guardando()"
+    [errorMensaje]="errorDialogo()"
+    (confirmar)="confirmarDecision($event)"
+    (cancelar)="cerrarDecision()"
+  />
+}

@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Duplicados generados por Finder / iCloud (p. ej. "package-lock 2.json")
+* 2.json
+* [0-9].json
+
+# Node (frontend)
+node_modules/
+frontend/dist/
+frontend/.angular/
+
+# Java (backend)
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+*.log
+
+# IDE
+.idea/
+*.iml

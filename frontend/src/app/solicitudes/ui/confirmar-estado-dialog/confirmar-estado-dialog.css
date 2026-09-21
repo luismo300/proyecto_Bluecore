@@ -1,0 +1,72 @@
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  padding: var(--e-4);
+}
+
+.fondo {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.55);
+}
+
+.dialogo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-4);
+  width: min(520px, 100%);
+  max-height: calc(100dvh - 2 * var(--e-4));
+  overflow-y: auto;
+  padding: var(--e-6);
+  box-shadow: var(--sombra-lg);
+}
+
+.dialogo__titulo {
+  font-size: var(--fs-xl);
+}
+
+.dialogo__resumen {
+  color: var(--c-texto-suave);
+}
+
+.dialogo__contador {
+  float: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.campo__error:empty {
+  display: none;
+}
+
+.dialogo__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--e-3);
+  margin-top: var(--e-2);
+}
+
+@media (max-width: 640px) {
+  :host {
+    place-items: end center;
+    padding: 0;
+  }
+
+  .dialogo {
+    width: 100%;
+    max-height: 92dvh;
+    padding: var(--e-5) var(--e-4) var(--e-6);
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+  }
+
+  .dialogo__acciones {
+    flex-direction: column-reverse;
+  }
+
+  .dialogo__acciones .boton {
+    width: 100%;
+  }
+}

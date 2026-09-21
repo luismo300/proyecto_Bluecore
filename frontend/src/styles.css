@@ -1,1 +1,388 @@
-/* You can add global styles to this file, and also import other style files */
+/* =========================================================================
+   BlueCore — sistema de estilos
+   Tokens y primitivas compartidas. Los componentes solo definen su layout.
+   Todos los pares de color cumplen WCAG 2.2 AA (contraste mínimo 5.38:1).
+   ========================================================================= */
+
+:root {
+  /* --- Color: marca ------------------------------------------------- */
+  --c-primario: #1b4d89; /* azul institucional — 8.50:1 sobre blanco */
+  --c-primario-hover: #163d6e;
+  --c-primario-suave: #e8f0f9;
+  --c-acento: #046c4e; /* verde — acciones de confirmación */
+  --c-acento-hover: #035a41;
+
+  /* --- Color: superficies y texto ----------------------------------- */
+  --c-fondo: #f4f6fa;
+  --c-superficie: #ffffff;
+  --c-superficie-alt: #f8fafc;
+  --c-borde: #dde3ec;
+  --c-borde-fuerte: #b9c3d3;
+  --c-texto: #0f172a; /* 17.85:1 sobre blanco */
+  --c-texto-suave: #475569; /* 7.58:1 sobre blanco */
+
+  /* --- Color: estados ----------------------------------------------- */
+  --c-pendiente-fg: #92400e;
+  --c-pendiente-bg: #fef3c7;
+  --c-aprobada-fg: #046c4e;
+  --c-aprobada-bg: #d1fae5;
+  --c-rechazada-fg: #b42318;
+  --c-rechazada-bg: #fee2e2;
+  --c-error: #b42318; /* rojo reservado a errores y rechazos */
+  --c-error-bg: #fef2f2;
+  --c-exito: #046c4e;
+  --c-exito-bg: #ecfdf5;
+
+  /* --- Tipografía ---------------------------------------------------- */
+  --fuente:
+    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --fs-base: 1rem; /* 16px — mínimo para cualquier texto de lectura */
+  --fs-lg: 1.125rem; /* 18px */
+  --fs-xl: 1.375rem; /* 22px */
+  --fs-2xl: 1.75rem; /* 28px */
+  --fs-etiqueta: 0.8125rem; /* 13px — solo para badges en versalitas */
+  --peso-normal: 400;
+  --peso-medio: 500;
+  --peso-fuerte: 600;
+  --peso-titulo: 700;
+  --interlineado: 1.55;
+
+  /* --- Espaciado (escala de 4px) ------------------------------------ */
+  --e-1: 0.25rem;
+  --e-2: 0.5rem;
+  --e-3: 0.75rem;
+  --e-4: 1rem;
+  --e-5: 1.5rem;
+  --e-6: 2rem;
+  --e-7: 3rem;
+
+  /* --- Radios, sombras, transiciones -------------------------------- */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-full: 999px;
+  --sombra-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --sombra-md: 0 4px 16px rgba(15, 23, 42, 0.08);
+  --sombra-lg: 0 18px 48px rgba(15, 23, 42, 0.18);
+  --transicion: 150ms ease;
+
+  --ancho-contenido: 1040px;
+}
+
+/* --- Base ------------------------------------------------------------ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--c-fondo);
+  color: var(--c-texto);
+  font-family: var(--fuente);
+  font-size: var(--fs-base);
+  line-height: var(--interlineado);
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.25;
+  color: var(--c-texto);
+}
+
+h1 {
+  font-size: var(--fs-2xl);
+  font-weight: var(--peso-titulo);
+}
+h2 {
+  font-size: var(--fs-xl);
+  font-weight: var(--peso-fuerte);
+}
+h3 {
+  font-size: var(--fs-lg);
+  font-weight: var(--peso-fuerte);
+}
+
+p {
+  margin: 0;
+}
+
+/* Foco visible y consistente en todo lo interactivo (WCAG 2.4.7). */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--c-primario);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* --- Primitivas: superficie ------------------------------------------ */
+.tarjeta {
+  background-color: var(--c-superficie);
+  border: 1px solid var(--c-borde);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sombra-md);
+}
+
+/* --- Primitivas: botones --------------------------------------------- */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e-2);
+  min-height: 44px; /* objetivo táctil cómodo */
+  padding: var(--e-3) var(--e-5);
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  font-family: inherit;
+  font-size: var(--fs-base);
+  font-weight: var(--peso-fuerte);
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background-color var(--transicion),
+    border-color var(--transicion),
+    color var(--transicion);
+}
+
+.boton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.boton--primario {
+  background-color: var(--c-primario);
+  color: #ffffff;
+}
+.boton--primario:hover:not(:disabled) {
+  background-color: var(--c-primario-hover);
+}
+
+.boton--secundario {
+  background-color: var(--c-superficie);
+  border-color: var(--c-borde-fuerte);
+  color: var(--c-primario);
+}
+.boton--secundario:hover:not(:disabled) {
+  background-color: var(--c-primario-suave);
+}
+
+.boton--aprobar {
+  background-color: var(--c-acento);
+  color: #ffffff;
+}
+.boton--aprobar:hover:not(:disabled) {
+  background-color: var(--c-acento-hover);
+}
+
+.boton--rechazar {
+  background-color: var(--c-superficie);
+  border-color: var(--c-error);
+  color: var(--c-error);
+}
+.boton--rechazar:hover:not(:disabled) {
+  background-color: var(--c-error);
+  color: #ffffff;
+}
+
+.boton--peligro {
+  background-color: var(--c-error);
+  color: #ffffff;
+}
+.boton--peligro:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+/* --- Primitivas: formulario ------------------------------------------ */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-2);
+}
+
+.campo__etiqueta {
+  font-size: var(--fs-base);
+  font-weight: var(--peso-medio);
+  color: var(--c-texto);
+}
+
+.campo__control,
+.campo__grupo {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 var(--e-4);
+  background-color: var(--c-superficie);
+  border: 1px solid var(--c-borde-fuerte);
+  border-radius: var(--r-sm);
+  font-family: inherit;
+  font-size: var(--fs-base);
+  color: var(--c-texto);
+  transition:
+    border-color var(--transicion),
+    box-shadow var(--transicion);
+}
+
+.campo__control:hover:not(:disabled),
+.campo__grupo:hover {
+  border-color: var(--c-primario);
+}
+
+.campo__control:focus,
+.campo__grupo:focus-within {
+  border-color: var(--c-primario);
+  box-shadow: 0 0 0 3px var(--c-primario-suave);
+  outline: none;
+}
+
+/* Input embebido dentro de un grupo con prefijo/sufijo ($ · meses). */
+.campo__grupo .campo__control {
+  min-height: auto;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  flex: 1;
+}
+
+.campo__afijo {
+  color: var(--c-texto-suave);
+  font-weight: var(--peso-medio);
+  white-space: nowrap;
+}
+
+.campo--invalido .campo__control,
+.campo--invalido .campo__grupo {
+  border-color: var(--c-error);
+}
+.campo--invalido .campo__control:focus,
+.campo--invalido .campo__grupo:focus-within {
+  box-shadow: 0 0 0 3px var(--c-error-bg);
+}
+
+.campo__ayuda {
+  font-size: var(--fs-base);
+  color: var(--c-texto-suave);
+}
+
+.campo__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e-2);
+  font-size: var(--fs-base);
+  font-weight: var(--peso-medio);
+  color: var(--c-error);
+}
+
+textarea.campo__control {
+  min-height: 108px;
+  padding: var(--e-3) var(--e-4);
+  line-height: var(--interlineado);
+  resize: vertical;
+}
+
+/* --- Primitivas: badges de estado ------------------------------------ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  padding: var(--e-1) var(--e-3);
+  border-radius: var(--r-full);
+  font-size: var(--fs-etiqueta);
+  font-weight: var(--peso-fuerte);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.badge--pendiente {
+  background-color: var(--c-pendiente-bg);
+  color: var(--c-pendiente-fg);
+}
+.badge--aprobada {
+  background-color: var(--c-aprobada-bg);
+  color: var(--c-aprobada-fg);
+}
+.badge--rechazada {
+  background-color: var(--c-rechazada-bg);
+  color: var(--c-rechazada-fg);
+}
+
+/* --- Primitivas: avisos ---------------------------------------------- */
+.aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e-3);
+  padding: var(--e-4);
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  font-size: var(--fs-base);
+}
+
+.aviso--exito {
+  background-color: var(--c-exito-bg);
+  border-color: var(--c-exito);
+  color: var(--c-exito);
+}
+
+.aviso--error {
+  background-color: var(--c-error-bg);
+  border-color: var(--c-error);
+  color: var(--c-error);
+}
+
+.aviso__titulo {
+  font-weight: var(--peso-fuerte);
+}
+
+/* --- Utilidades ------------------------------------------------------- */
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.girador {
+  width: 18px;
+  height: 18px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: girar 0.7s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}

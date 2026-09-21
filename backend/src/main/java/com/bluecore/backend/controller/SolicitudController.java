@@ -62,6 +62,7 @@ public class SolicitudController {
         return repository.findById(id)
                 .map(solicitud -> {
                     solicitud.setEstado(dto.getEstado());
+                    solicitud.setComentario(dto.getComentario());
                     return ResponseEntity.ok(repository.save(solicitud));
                 })
                 .orElse(ResponseEntity.notFound().build());

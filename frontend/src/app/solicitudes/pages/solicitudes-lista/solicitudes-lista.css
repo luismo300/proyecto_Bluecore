@@ -1,0 +1,205 @@
+.listado {
+  padding: var(--e-6);
+}
+
+.listado__encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--e-4);
+  margin-bottom: var(--e-5);
+}
+
+.listado__subtitulo {
+  margin-top: var(--e-2);
+  color: var(--c-texto-suave);
+}
+
+.listado__filtro {
+  min-width: 220px;
+}
+
+.aviso {
+  margin-bottom: var(--e-4);
+}
+
+.aviso__acciones {
+  margin-top: var(--e-3);
+}
+
+/* --- Tabla ------------------------------------------------------------ */
+.tabla__marco {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla th {
+  padding: var(--e-3) var(--e-3);
+  border-bottom: 2px solid var(--c-borde);
+  color: var(--c-texto-suave);
+  font-size: var(--fs-base);
+  font-weight: var(--peso-fuerte);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tabla td {
+  padding: var(--e-4) var(--e-3);
+  border-bottom: 1px solid var(--c-borde);
+  vertical-align: middle;
+}
+
+.tabla tbody tr:hover {
+  background-color: var(--c-superficie-alt);
+}
+
+.tabla__numero {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--peso-fuerte);
+}
+
+.tabla__comentario {
+  max-width: 260px;
+  margin-top: var(--e-2);
+  overflow: hidden;
+  color: var(--c-texto-suave);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.acciones {
+  display: flex;
+  gap: var(--e-2);
+}
+
+.acciones__boton {
+  min-height: 40px;
+  padding: var(--e-2) var(--e-4);
+}
+
+.acciones__resuelta {
+  color: var(--c-texto-suave);
+}
+
+/* --- Estados vacío y de carga ---------------------------------------- */
+.vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--e-3);
+  padding: var(--e-7) var(--e-4);
+  background-color: var(--c-superficie-alt);
+  border: 1px dashed var(--c-borde-fuerte);
+  border-radius: var(--r-md);
+  text-align: center;
+}
+
+.vacio__titulo {
+  font-size: var(--fs-lg);
+  font-weight: var(--peso-fuerte);
+}
+
+.vacio__texto {
+  color: var(--c-texto-suave);
+}
+
+.marcador {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+}
+
+.marcador__fila {
+  height: 64px;
+  border-radius: var(--r-md);
+  background: linear-gradient(
+    90deg,
+    var(--c-superficie-alt) 25%,
+    var(--c-borde) 50%,
+    var(--c-superficie-alt) 75%
+  );
+  background-size: 200% 100%;
+  animation: destello 1.4s ease-in-out infinite;
+}
+
+@keyframes destello {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* --- Móvil: la tabla se apila en tarjetas ---------------------------- */
+@media (max-width: 768px) {
+  .listado {
+    padding: var(--e-4);
+  }
+
+  .listado__filtro {
+    width: 100%;
+  }
+
+  .tabla,
+  .tabla tbody,
+  .tabla tr,
+  .tabla td {
+    display: block;
+    width: 100%;
+  }
+
+  .tabla thead {
+    /* El encabezado se sustituye por la etiqueta de cada celda */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .tabla tr {
+    margin-bottom: var(--e-4);
+    padding: var(--e-2) var(--e-4);
+    border: 1px solid var(--c-borde);
+    border-radius: var(--r-md);
+    background-color: var(--c-superficie);
+  }
+
+  .tabla td {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--e-4);
+    padding: var(--e-3) 0;
+    border-bottom: 1px solid var(--c-borde);
+    text-align: right;
+  }
+
+  .tabla tr td:last-child {
+    border-bottom: none;
+  }
+
+  .tabla td::before {
+    content: attr(data-etiqueta);
+    color: var(--c-texto-suave);
+    font-weight: var(--peso-medio);
+    text-align: left;
+  }
+
+  .tabla__comentario {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .acciones {
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  .acciones__boton {
+    flex: 1;
+  }
+}

@@ -1,0 +1,83 @@
+<div class="fondo" (click)="cancelar.emit()" aria-hidden="true"></div>
+
+<div
+  #contenedor
+  class="dialogo tarjeta"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="titulo-dialogo"
+  aria-describedby="resumen-dialogo"
+>
+  <h2 id="titulo-dialogo" class="dialogo__titulo">{{ titulo() }}</h2>
+
+  <p id="resumen-dialogo" class="dialogo__resumen">
+    Solicitud <strong>N.º {{ solicitud().id }}</strong> · cédula
+    <strong>{{ solicitud().cedula }}</strong> · <strong>{{ montoFormateado() }}</strong> a
+    {{ solicitud().plazoMeses }} meses. Pasará a <strong>{{ etiquetaDestino() }}</strong
+    >.
+  </p>
+
+  <div class="campo" [class.campo--invalido]="errorComentario()">
+    <label class="campo__etiqueta" for="comentario">
+      Comentario de la decisión <span aria-hidden="true">*</span>
+    </label>
+    <textarea
+      #campoComentario
+      id="comentario"
+      class="campo__control"
+      rows="4"
+      [attr.maxlength]="maximo"
+      [disabled]="enviando()"
+      [value]="comentario()"
+      (input)="alEscribir($any($event.target).value)"
+      aria-describedby="ayuda-comentario error-comentario"
+      [attr.aria-invalid]="errorComentario() ? true : null"
+      [attr.aria-required]="true"
+      placeholder="Ej.: Ingresos verificados y capacidad de pago suficiente."
+    ></textarea>
+
+    <p class="campo__ayuda" id="ayuda-comentario">
+      Obligatorio. Queda registrado junto a la solicitud.
+      <span class="dialogo__contador">{{ comentario().length }}/{{ maximo }}</span>
+    </p>
+
+    <p class="campo__error" id="error-comentario" aria-live="polite">
+      {{ errorComentario() }}
+    </p>
+  </div>
+
+  @if (errorMensaje(); as mensaje) {
+    <div class="aviso aviso--error" role="alert">
+      <div>
+        <p class="aviso__titulo">No se pudo actualizar la solicitud</p>
+        <p>{{ mensaje }}</p>
+      </div>
+    </div>
+  }
+
+  <div class="dialogo__acciones">
+    <button
+      type="button"
+      class="boton boton--secundario"
+      [disabled]="enviando()"
+      (click)="cancelar.emit()"
+    >
+      Cancelar
+    </button>
+    <button
+      type="button"
+      class="boton"
+      [class.boton--peligro]="esRechazo()"
+      [class.boton--aprobar]="!esRechazo()"
+      [disabled]="enviando()"
+      (click)="enviar()"
+    >
+      @if (enviando()) {
+        <span class="girador" aria-hidden="true"></span>
+        Guardando…
+      } @else {
+        Confirmar {{ etiquetaDestino().toLowerCase() }}
+      }
+    </button>
+  </div>
+</div>

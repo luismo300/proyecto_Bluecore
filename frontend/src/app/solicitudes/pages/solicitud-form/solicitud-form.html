@@ -1,0 +1,179 @@
+<section class="tarjeta formulario" aria-labelledby="titulo-formulario">
+  <header class="formulario__encabezado">
+    <h2 id="titulo-formulario">Nueva solicitud de crédito</h2>
+    <p class="formulario__subtitulo">
+      Completa los datos del solicitante. La solicitud se registra como
+      <strong>pendiente</strong> y queda a la espera de revisión.
+    </p>
+  </header>
+
+  <!-- Región viva: anuncia confirmación y errores a lectores de pantalla -->
+  <div aria-live="polite" aria-atomic="true">
+    @if (solicitudCreada(); as creada) {
+      <div class="aviso aviso--exito">
+        <div>
+          <p class="aviso__titulo">Solicitud registrada correctamente</p>
+          <p>
+            N.º {{ creada.id }} · {{ formatearMoneda(creada.monto) }} a
+            {{ creada.plazoMeses }} meses · cédula {{ creada.cedula }}
+          </p>
+          <div class="aviso__acciones">
+            <button type="button" class="boton boton--secundario" (click)="verListado.emit()">
+              Ver en el listado
+            </button>
+            <button type="button" class="boton boton--secundario" (click)="cerrarConfirmacion()">
+              Crear otra
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (errorGeneral(); as mensaje) {
+      <div class="aviso aviso--error">
+        <div>
+          <p class="aviso__titulo">No se pudo crear la solicitud</p>
+          <p>{{ mensaje }}</p>
+        </div>
+      </div>
+    }
+  </div>
+
+  <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+    <!-- Cédula -->
+    <div class="campo" [class.campo--invalido]="debeMostrarError(cedula)">
+      <label class="campo__etiqueta" for="cedula">Cédula del solicitante</label>
+      <input
+        id="cedula"
+        type="text"
+        class="campo__control"
+        formControlName="cedula"
+        inputmode="text"
+        autocomplete="off"
+        placeholder="8-123-4567"
+        aria-describedby="ayuda-cedula error-cedula"
+        [attr.aria-invalid]="debeMostrarError(cedula) || null"
+        (input)="alEscribirCedula($event)"
+      />
+      <p class="campo__ayuda" id="ayuda-cedula">
+        Formato: provincia, tomo y asiento. Ejemplos: 8-123-4567, PE-12-345, E-8-12345.
+      </p>
+      <p class="campo__error" id="error-cedula">
+        @if (debeMostrarError(cedula)) {
+          @if (errorDelBackend(cedula); as mensaje) {
+            {{ mensaje }}
+          } @else if (cedula.errors?.['required']) {
+            La cédula del solicitante es obligatoria.
+          } @else if (cedula.errors?.['formatoCedula']) {
+            El formato no es válido. Debe ser similar a 8-123-4567.
+          }
+        }
+      </p>
+    </div>
+
+    <!-- Monto -->
+    <div class="campo" [class.campo--invalido]="debeMostrarError(monto)">
+      <label class="campo__etiqueta" for="monto">Monto solicitado</label>
+      <div class="campo__grupo">
+        <span class="campo__afijo" aria-hidden="true">$</span>
+        <input
+          id="monto"
+          type="text"
+          class="campo__control"
+          formControlName="monto"
+          inputmode="decimal"
+          autocomplete="off"
+          placeholder="10,000"
+          aria-describedby="ayuda-monto error-monto"
+          [attr.aria-invalid]="debeMostrarError(monto) || null"
+          (input)="alEscribirMonto($event)"
+        />
+        <span class="campo__afijo" aria-hidden="true">USD</span>
+      </div>
+      <p class="campo__ayuda" id="ayuda-monto">
+        Entre {{ formatearMonedaCompacta(reglas.montoMinimo) }} y
+        {{ formatearMonedaCompacta(reglas.montoMaximo) }}.
+        @if (montoPrevisto(); as previsto) {
+          <span class="campo__previsto">Se registrará {{ previsto }}.</span>
+        }
+      </p>
+      <p class="campo__error" id="error-monto">
+        @if (debeMostrarError(monto)) {
+          @if (errorDelBackend(monto); as mensaje) {
+            {{ mensaje }}
+          } @else if (monto.errors?.['required']) {
+            El monto es obligatorio.
+          } @else if (monto.errors?.['montoInvalido']) {
+            Introduce un monto numérico válido.
+          } @else if (monto.errors?.['montoMinimo']) {
+            El monto mínimo permitido es {{ formatearMonedaCompacta(reglas.montoMinimo) }}.
+          } @else if (monto.errors?.['montoMaximo']) {
+            El monto máximo permitido es {{ formatearMonedaCompacta(reglas.montoMaximo) }}.
+          }
+        }
+      </p>
+    </div>
+
+    <!-- Plazo -->
+    <div class="campo" [class.campo--invalido]="debeMostrarError(plazoMeses)">
+      <label class="campo__etiqueta" for="plazo">Plazo</label>
+      <div class="campo__grupo">
+        <input
+          id="plazo"
+          type="number"
+          class="campo__control"
+          formControlName="plazoMeses"
+          inputmode="numeric"
+          [min]="reglas.plazoMinimo"
+          [max]="reglas.plazoMaximo"
+          step="1"
+          placeholder="24"
+          aria-describedby="ayuda-plazo error-plazo"
+          [attr.aria-invalid]="debeMostrarError(plazoMeses) || null"
+        />
+        <span class="campo__afijo" aria-hidden="true">meses</span>
+      </div>
+
+      <div class="plazos" role="group" aria-label="Plazos frecuentes">
+        @for (meses of plazosSugeridos; track meses) {
+          <button
+            type="button"
+            class="plazos__opcion"
+            [class.plazos__opcion--activa]="plazoMeses.value === meses"
+            [attr.aria-pressed]="plazoMeses.value === meses"
+            [disabled]="enviando()"
+            (click)="elegirPlazo(meses)"
+          >
+            {{ meses }} meses
+          </button>
+        }
+      </div>
+
+      <p class="campo__ayuda" id="ayuda-plazo">
+        Entre {{ reglas.plazoMinimo }} y {{ reglas.plazoMaximo }} meses.
+      </p>
+      <p class="campo__error" id="error-plazo">
+        @if (debeMostrarError(plazoMeses)) {
+          @if (errorDelBackend(plazoMeses); as mensaje) {
+            {{ mensaje }}
+          } @else if (plazoMeses.errors?.['required']) {
+            El plazo es obligatorio.
+          } @else if (plazoMeses.errors?.['min']) {
+            El plazo mínimo es de {{ reglas.plazoMinimo }} meses.
+          } @else if (plazoMeses.errors?.['max']) {
+            El plazo máximo es de {{ reglas.plazoMaximo }} meses.
+          }
+        }
+      </p>
+    </div>
+
+    <button type="submit" class="boton boton--primario formulario__enviar" [disabled]="enviando()">
+      @if (enviando()) {
+        <span class="girador" aria-hidden="true"></span>
+        Enviando…
+      } @else {
+        Crear solicitud
+      }
+    </button>
+  </form>
+</section>
