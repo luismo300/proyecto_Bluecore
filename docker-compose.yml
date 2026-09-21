@@ -1,0 +1,24 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: bluecore-backend
+    # required: false permite arrancar sin .env, usando lo que trae la imagen.
+    env_file:
+      - path: .env
+        required: false
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: bluecore-frontend
+    # 4200 en el host aunque el SSR escuche en el 4000: el backend restringe
+    # CORS a http://localhost:4200, que es el origen que verá el navegador.
+    ports:
+      - "4200:4000"
+    depends_on:
+      - backend
+    restart: unless-stopped

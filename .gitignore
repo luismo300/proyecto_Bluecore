@@ -22,3 +22,6 @@ backend/.mvn/wrapper/maven-wrapper.jar
 # IDE
 .idea/
 *.iml
+
+# Variables de entorno locales (docker compose)
+.env
